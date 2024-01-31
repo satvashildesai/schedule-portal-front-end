@@ -1,0 +1,16 @@
+<app-header></app-header>
+
+<div class="container border border-black p-4 mt-5 shadow">
+    <nav>
+        <div class="nav nav-tabs row d-flex justify-content-center" id="nav-tab" role="tablist">
+            <button class="nav-link col-3 active" id="nav-home-tab" data-bs-toggle="tab" type="button" role="tab"
+                aria-controls="nav-home" aria-selected="true" routerLink="staff">Staff</button>
+            <button class="nav-link col-3" id="nav-profile-tab" data-bs-toggle="tab" type="button" role="tab"
+                aria-controls="nav-profile" aria-selected="false" routerLink="shift">Shift</button>
+            <button class="nav-link col-3" id="nav-contact-tab" data-bs-toggle="tab" type="button" role="tab"
+                aria-controls="nav-contact" aria-selected="false" routerLink="schedule">Schedule</button>
+        </div>
+    </nav>
+
+    <router-outlet></router-outlet>
+</div>

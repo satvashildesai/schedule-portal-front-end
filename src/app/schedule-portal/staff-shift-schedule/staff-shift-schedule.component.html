@@ -1,0 +1,198 @@
+<div class="mt-5 mx-2 overflow-auto">
+  <div class="d-flex justify-content-between">
+    <div>
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+      >
+        create
+      </button>
+    </div>
+    <div>
+      <input type="text" placeholder="Search" class="rounded-2" />
+      <button class="btn btn-light ms-2">
+        <img
+          class="border-1"
+          src="./assets/images/searchIcon.png"
+          alt="Search Icon"
+          height="20"
+          width="20"
+        />
+      </button>
+    </div>
+  </div>
+  <div class="my-3 border shadow-sm overflow-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Shift Id</th>
+          <th scope="col">Shift Date</th>
+          <th scope="col">Shift Time</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let assignment of staffShiftAssignList">
+          <th>{{ assignment.shift.id }}</th>
+          <th>{{ assignment.shift.date }}</th>
+          <td>
+            {{ assignment.shift.startTime }} to {{ assignment.shift.endTime }}
+          </td>
+
+          <td class="text-nowrap">
+            <i
+              class="bi bi-eye"
+              data-bs-toggle="modal"
+              data-bs-target="#vScheduledDetails"
+              role="button"
+              (click)="getScheduleToView(assignment)"
+            ></i>
+
+            <i
+              class="bi bi-trash mx-3"
+              role="button"
+              (click)="
+                deleteAssignment(assignment.shift.id, assignment.shift.date)
+              "
+              style="color: red"
+            ></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create shift modal -->
+<div
+  class="modal fade"
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">
+          Assign staff to shift!
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          class="px-5"
+          #assignModal="ngForm"
+          (ngSubmit)="assignStaffShift(assignModal.value)"
+        >
+          <label class="mt-2" for="assignShift">Shift:</label>
+          <input
+            class="form-control shadow-sm"
+            #assignShift
+            type="number"
+            name="assignShift"
+            placeholder="Enter shift id"
+            ngModel
+          />
+
+          <label class="mt-2" for="assignStaff">Staff: </label>
+          <div class="mb-2 d-flex justify-content-between">
+            <input
+              class="form-control shadow-sm w-75"
+              type="number"
+              name="assignStaff"
+              #assignStaff
+              placeholder="Enter staff id"
+            />
+            <div
+              class="btn btn-primary"
+              (click)="getStaffIdList(assignStaff.value)"
+            >
+              Assign
+            </div>
+          </div>
+
+          <ul class="list-group" *ngFor="let staff of staffIdList">
+            <li class="list-group-item d-flex justify-content-center">
+              {{ staff }}
+              <div
+                class="ms-3 btn-close shadow-none"
+                (click)="removeStaff(staff)"
+              ></div>
+            </li>
+          </ul>
+
+          <div class="modal-footer mt-2">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              data-bs-dismiss="modal"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View scheduled details -->
+<div
+  class="modal fade"
+  id="vScheduledDetails"
+  tabindex="-1"
+  aria-labelledby="vScheduledDetails"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="vScheduledDetailsLabel">
+          Shift: {{ vAssignment?.shift.date }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <h6>
+          Assigned staff count: {{ vAssignment?.shift.requiredStaffCount }}
+        </h6>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let staff of vAssignment?.staffList">
+              <td>{{ staff.id }}</td>
+              <td>{{ staff.name }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

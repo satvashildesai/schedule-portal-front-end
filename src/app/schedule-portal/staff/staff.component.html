@@ -1,0 +1,375 @@
+<div class="mt-5 mx-2 overflow-auto">
+  <div class="d-flex justify-content-between flex-nowrap overflow-auto">
+    <div>
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+      >
+        create
+      </button>
+    </div>
+    <div>
+      <form
+        #dateFilter="ngForm"
+        (ngSubmit)="getStaffByDate(dateFilter.value)"
+        class="d-flex align-items-center"
+      >
+        <label for="fromDate">From:</label>
+        <input
+          type="date"
+          class="mx-1"
+          name="fromDate"
+          id="fromDate"
+          required
+          [(ngModel)]="filterStartDate"
+        />
+        <label for="toDate">To:</label>
+        <input
+          class="mx-1"
+          type="date"
+          name="toDate"
+          id="toDate"
+          required
+          [(ngModel)]="filterEndDate"
+        />
+        <button
+          class="btn rounded btn-secondary ms-2"
+          [disabled]="dateFilter.invalid"
+          #searchBtn
+        >
+          Search
+        </button>
+        <div
+          *ngIf="showBtn"
+          class="btn rounded btn-light ms-2"
+          (click)="displayAllStaff()"
+        >
+          Clear
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="my-3 border shadow-sm overflow-auto">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Staff Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let staff of staffList" style="height: 30px;">
+          <th scope="row">{{ staff.id }}</th>
+          <th scope="row">{{ staff.name }}</th>
+
+          <td class="text-nowrap">
+            <i
+              class="bi bi-eye"
+              data-bs-toggle="modal"
+              data-bs-target="#viewStaffDetails"
+              role="button"
+              (click)="getStaffDetails(staff)"
+            ></i>
+
+            <i
+              class="bi bi-pencil-square mx-3"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+              (click)="getStaffToEdit(staff)"
+              role="button"
+              style="color: blue"
+            ></i>
+
+            <i
+              class="bi bi-trash"
+              role="button"
+              (click)="deleteStaff(staff.id)"
+              style="color: red"
+            ></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create staff modal -->
+<div
+  class="modal fade"
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">
+          Create new staff member!
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form
+          #saveStaffModal="ngForm"
+          (ngSubmit)="saveStaff(saveStaffModal.value)"
+        >
+          <label class="mt-2" for="name">Name: </label>
+          <input
+            class="form-control shadow-sm"
+            type="text`"
+            name="name"
+            #name
+            ngModel
+          />
+
+          <label class="mt-2">Available date: </label>
+
+          <div class="d-flex justify-content-evenly gap-1">
+            <div class="d-flex gap-2">
+              <label for="fDate">From: </label>
+              <input
+                class="form-control shadow-sm custom-date"
+                type="date"
+                name="sDate"
+                #sDate
+              />
+            </div>
+
+            <div class="d-flex gap-2">
+              <label for="tDate">To: </label>
+              <input
+                class="form-control shadow-sm custom-date"
+                type="date"
+                name="eDate"
+                #eDate
+              />
+            </div>
+          </div>
+
+          <label class="mt2">Available time: </label>
+          <div class="my-2 d-flex justify-content-evenly">
+            <label for="startTime">From: </label>
+            <input
+              class="form-control shadow-sm w-25"
+              type="time"
+              name="startTime"
+              #startTime
+            />
+            <label for="endTime">To: </label>
+            <input
+              class="form-control shadow-sm w-25"
+              type="time"
+              name="endTime"
+              #endTime
+            />
+            <div
+              class="btn btn-primary"
+              (click)="
+                getAvailableDateTime(
+                  sDate.value,
+                  eDate.value,
+                  startTime.value,
+                  endTime.value
+                )
+              "
+            >
+              Add
+            </div>
+          </div>
+
+          <ul class="list-group" *ngFor="let dateTime of dateTimeList">
+            <li class="list-group-item d-flex justify-content-center">
+              {{ dateTime.date }} : From-{{ dateTime.startTime }} To-{{
+                dateTime.endTime
+              }}
+              <div
+                class="ms-3 btn-close shadow-none"
+                (click)="removeDateTime(dateTime)"
+              ></div>
+            </li>
+          </ul>
+
+          <div class="modal-footer mt-2">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              data-bs-dismiss="modal"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit staff modal -->
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit staff!</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="editStaffModal" (ngSubmit)="editStaff()">
+          <label class="mt-2" for="name">Name: </label>
+          <input
+            class="form-control shadow-sm"
+            type="text`"
+            name="name"
+            #name
+            formControlName="name"
+          />
+
+          <label class="mt-2 d-block" for="date"
+            >Available date and time:
+          </label>
+          <input
+            class="form-control shadow-sm custom-date"
+            type="date"
+            name="editDate"
+            #editDate
+          />
+          <div class="my-2 d-flex justify-content-evenly">
+            <label for="startTime">From: </label>
+            <input
+              class="form-control shadow-sm w-25"
+              type="time"
+              name="startTime"
+              #eStartTime
+            />
+            <label for="endTime">To: </label>
+            <input
+              class="form-control shadow-sm w-25"
+              type="time"
+              name="endTime"
+              #eEndTime
+            />
+            <div
+              class="btn btn-primary"
+              (click)="
+                getAvailableDateTime(
+                  editDate.value,
+                  editDate.value,
+                  eStartTime.value,
+                  eEndTime.value
+                )
+              "
+            >
+              Add
+            </div>
+          </div>
+
+          <ul class="list-group" *ngFor="let dateTime of dateTimeList">
+            <li class="list-group-item d-flex justify-content-center">
+              {{ dateTime.date }} : From-{{ dateTime.startTime }} To-{{
+                dateTime.endTime
+              }}
+              <div
+                class="ms-3 btn-close shadow-none"
+                (click)="removeDateTime(dateTime)"
+              ></div>
+            </li>
+          </ul>
+
+          <div class="modal-footer mx-0">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-success"
+              data-bs-dismiss="modal"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View staff details modal -->
+<div
+  class="modal fade"
+  id="viewStaffDetails"
+  tabindex="-1"
+  aria-labelledby="viewStaffDetails"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewStaffModalLable">
+          {{ vStaffDetails?.id }} : {{ vStaffDetails?.name }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+        <h6 class="d-block"></h6>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Available Dates</th>
+              <th scope="col">Start Time</th>
+              <th scope="col">End Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let dateTime of vStaffDetails?.availableDateTime"
+              [style.background-color]="
+                dateTime.scheduled ? '#FDFDC1' : '#FFFFFF'
+              "
+            >
+              <td>{{ dateTime.date }}</td>
+              <td>{{ dateTime.startTime }}</td>
+              <td>{{ dateTime.endTime }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
